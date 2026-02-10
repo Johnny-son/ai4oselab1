@@ -48,10 +48,10 @@ core::arch::global_asm!(include_str!(env!("APP_ASM")));
 // 最大支持的应用程序数量
 const APP_CAPACITY: usize = 32;
 
-// 定义内核入口点：分配 (APP_CAPACITY + 2) * 8 KiB = 272 KiB 的内核栈
-// 比第二章更大，因为需要同时容纳多个任务的内核上下文
+// 定义内核入口点：分配足够大的内核栈
+// 需要容纳多个任务的 TCB（含系统调用计数数组），因此栈空间需要比默认更大
 #[cfg(target_arch = "riscv64")]
-tg_linker::boot0!(rust_main; stack = (APP_CAPACITY + 2) * 8192);
+tg_linker::boot0!(rust_main; stack = (APP_CAPACITY + 2) * 2 * 8192);
 
 // ========== 内核主函数 ==========
 
@@ -272,8 +272,7 @@ mod impls {
 
     /// Trace 系统调用实现（练习题需要完成的部分）
     ///
-    /// 当前为占位实现，返回 -1 表示未实现。
-    /// 学生需要在练习中实现 trace 功能，支持：
+    /// 支持三种功能：
     /// - 读取用户内存（trace_request=0）
     /// - 写入用户内存（trace_request=1）
     /// - 查询系统调用计数（trace_request=2）
@@ -281,13 +280,39 @@ mod impls {
         #[inline]
         fn trace(
             &self,
-            _caller: Caller,
-            _trace_request: usize,
-            _id: usize,
-            _data: usize,
+            caller: Caller,
+            trace_request: usize,
+            id: usize,
+            data: usize,
         ) -> isize {
-            tg_console::log::info!("trace: not implemented");
-            -1
+            match trace_request {
+                // trace_request=0: 读取用户内存
+                // id 视作 *const u8，返回该地址处一个字节的无符号整数值
+                0 => {
+                    let ptr = id as *const u8;
+                    unsafe { *ptr as isize }
+                }
+                // trace_request=1: 写入用户内存
+                // id 视作 *mut u8，写入 data 的最低字节，返回 0
+                1 => {
+                    let ptr = id as *mut u8;
+                    unsafe { *ptr = data as u8 };
+                    0
+                }
+                // trace_request=2: 查询系统调用计数
+                // caller.entity 中存储了 syscall_counts 数组的指针
+                // id 为系统调用编号，返回该调用的次数（本次调用已计入）
+                2 => {
+                    let counts = caller.entity as *const usize;
+                    if id < 512 {
+                        unsafe { *counts.add(id) as isize }
+                    } else {
+                        0
+                    }
+                }
+                // 其他情况返回 -1
+                _ => -1,
+            }
         }
     }
 }
