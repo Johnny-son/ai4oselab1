@@ -1,0 +1,33 @@
+[workspace]
+resolver = "2"
+
+members = [
+  "ch1",
+  "ch2",
+  "ch3",
+]
+
+exclude = [
+  "ch2/tg-user",
+  "ch3/tg-user",
+]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+
+# 先把可复用组件以 path 形式统一管理，后续你要“hack/改组件”会很方便
+[workspace.dependencies]
+# 外部依赖
+riscv = "0.10.1"
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+
+# 内部组件（由 Work/crates 提供）
+tg-sbi = { path = "../crates/tg-sbi" }
+tg-linker = { path = "../crates/tg-linker" }
+tg-console = { path = "../crates/tg-console" }
+tg-kernel-context = { path = "../crates/tg-kernel-context" }
+tg-syscall = { path = "../crates/tg-syscall" }

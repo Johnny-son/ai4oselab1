@@ -1,0 +1,19 @@
+[build]
+target = "riscv64gc-unknown-none-elf"
+
+# 让 `cargo run` 直接跑 qemu（和参考仓库一致）
+[target.riscv64gc-unknown-none-elf]
+runner = [
+	"qemu-system-riscv64",
+	"-machine", "virt",
+	"-nographic",
+	"-bios", "none",
+	"-kernel",
+]
+
+[unstable]
+build-std = ["core", "compiler_builtins", "alloc"]
+
+[env]
+# 给后续 tg-user 拉取/测试预留：你可以按需改成本地路径
+TG_USER_DIR = { value = "tg-user", relative = true }
