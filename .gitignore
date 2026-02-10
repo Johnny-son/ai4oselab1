@@ -11,6 +11,9 @@ Cargo.lock
 **/*.swp
 **/*.swo
 
+# Local-only folders (do not commit)
+Reference/
+Guide/
 # Rust analyzer / misc
 **/.rustc_info.json
 **/.cargo_vcs_info.json
