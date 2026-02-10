@@ -9,3 +9,7 @@ repository = "https://github.com/learningos/ai4ose-lab1-2026s"
 readme = "README.md"
 keywords = ["os", "kernel", "learning", "AI4OSE","AI"]
 categories = ["command-line-utilities"]
+
+[[bin]]
+name = "ai4ose-lab1-2026s"
+path = "src/main.rs"
