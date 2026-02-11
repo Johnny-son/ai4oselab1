@@ -6,12 +6,14 @@ members = [
   "ch2",
   "ch3",
   "ch4",
+  "ch5",
 ]
 
 exclude = [
   "ch2/tg-user",
   "ch3/tg-user",
   "ch4/tg-user",
+  "ch5/tg-user",
 ]
 
 [profile.dev]
@@ -27,6 +29,7 @@ riscv = "0.10.1"
 serde = { version = "1", features = ["derive"] }
 toml = "0.8"
 xmas-elf = "0.8.0"
+spin = "0.9"
 
 # 内部组件（由 Work/crates 提供）
 tg-sbi = { path = "../crates/tg-sbi" }
@@ -36,3 +39,4 @@ tg-kernel-context = { path = "../crates/tg-kernel-context" }
 tg-syscall = { path = "../crates/tg-syscall" }
 tg-kernel-alloc = { path = "../crates/tg-kernel-alloc" }
 tg-kernel-vm = { path = "../crates/tg-kernel-vm" }
+tg-task-manage = { path = "../crates/tg-task-manage" }
